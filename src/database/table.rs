@@ -12,12 +12,13 @@ pub struct Table {
 }
 
 impl Table {
-  pub fn init(root_dir: PathBuf, name: String) -> Table {
-    let hexed_name = hex::encode(name.clone());
+  pub fn init<S: AsRef<str>>(root_dir: PathBuf, name: S) -> Table {
+    let name_ref = name.as_ref();
+    let hexed_name = hex::encode(name_ref);
     let table_dir = Path::new(root_dir.as_path()).join(hexed_name);
     fs_extra::ensure_dir(table_dir.clone());
     Table {
-      name,
+      name: name_ref.to_string(),
       table_dir,
       root_dir,
     }
@@ -27,8 +28,9 @@ impl Table {
     self.name.clone()
   }
 
-  pub fn set_name(&mut self, new_name: String) -> bool {
-    self.name = new_name;
+  pub fn set_name<S: AsRef<str>>(&mut self, new_name: S) -> bool {
+    let new_name_ref = new_name.as_ref();
+    self.name = new_name_ref.to_string();
     let hexed_name = hex::encode(self.name.clone());
     let new_table_dir = Path::new(self.root_dir.as_path()).join(hexed_name);
     let success = fs::rename(self.table_dir.clone(), new_table_dir.clone());
@@ -40,13 +42,15 @@ impl Table {
     fs::remove_dir_all(self.table_dir.clone()).is_ok()
   }
 
-  pub fn has(&self, key: String) -> bool {
+  pub fn has<S: AsRef<str>>(&self, k: S) -> bool {
+    let key = k.as_ref();
     let hexed_key = hex::encode(key);
     let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
     data_file_path.exists() && data_file_path.is_file()
   }
 
-  pub fn get(&self, key: String) -> Option<String> {
+  pub fn get<S: AsRef<str>>(&self, k: S) -> Option<String> {
+    let key = k.as_ref();
     let hexed_key = hex::encode(key);
     let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
 
@@ -63,7 +67,9 @@ impl Table {
     Some(maybe_file_content.unwrap())
   }
 
-  pub fn set(&self, key: String, value: String) -> bool {
+  pub fn set<S: AsRef<str>>(&self, k: S, v: S) -> bool {
+    let key = k.as_ref();
+    let value = v.as_ref();
     let hexed_key = hex::encode(key);
     let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
     let ensured = fs_extra::ensure_file(data_file_path.clone());
@@ -75,7 +81,8 @@ impl Table {
     fs::write(data_file_path, value).is_ok()
   }
 
-  pub fn remove(&self, key: String) -> bool {
+  pub fn remove<S: AsRef<str>>(&self, k: S) -> bool {
+    let key = k.as_ref();
     let hexed_key = hex::encode(key);
     let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
 

@@ -16,12 +16,13 @@ pub struct Database {
 }
 
 impl Database {
-  pub fn init(path: PathBuf, name: String) -> Database {
-    let hexed_name = hex::encode(name.clone());
+  pub fn init<S: AsRef<str>>(path: PathBuf, name: S) -> Database {
+    let name_ref = name.as_ref();
+    let hexed_name = hex::encode(name_ref);
     let database_dir = Path::new(path.as_path()).join(hexed_name);
     fs_extra::ensure_dir(database_dir.clone());
     Database {
-      name,
+      name: name_ref.to_string(),
       database_dir,
       root_dir: path,
     }
@@ -31,8 +32,8 @@ impl Database {
     self.name.clone()
   }
 
-  pub fn set_name(&mut self, new_name: String) -> bool {
-    self.name = new_name;
+  pub fn set_name<S: AsRef<str>>(&mut self, new_name: S) -> bool {
+    self.name = new_name.as_ref().to_string();
     let hexed_name = hex::encode(self.name.clone());
     let new_db_dir = Path::new(self.root_dir.as_path()).join(hexed_name);
     let success = fs::rename(self.database_dir.clone(), new_db_dir.clone());
@@ -40,12 +41,13 @@ impl Database {
     success.is_ok()
   }
 
-  pub fn create_table(&self, name: String) -> Table {
+  pub fn init_table<S: AsRef<str>>(&self, name: S) -> Table {
     Table::init(self.database_dir.clone(), name)
   }
 
-  pub fn drop_table(&self, name: String) -> bool {
-    let hexed_name = hex::encode(name.clone());
+  pub fn drop_table<S: AsRef<str>>(&self, name: S) -> bool {
+    let name_ref = name.as_ref();
+    let hexed_name = hex::encode(name_ref);
     let table_dir = Path::new(self.database_dir.as_path()).join(hexed_name);
     fs::remove_dir_all(table_dir.clone()).is_ok() && fs::remove_dir(table_dir).is_ok()
   }
