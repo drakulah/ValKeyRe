@@ -5,21 +5,21 @@ use std::{
 
 use crate::fs_extra;
 
-pub struct Table {
+pub struct Room {
   name: String,
   root_dir: PathBuf,
-  table_dir: PathBuf,
+  room_dir: PathBuf,
 }
 
-impl Table {
-  pub fn init<S: AsRef<str>>(root_dir: PathBuf, name: S) -> Table {
+impl Room {
+  pub fn init<S: AsRef<str>>(root_dir: PathBuf, name: S) -> Room {
     let name_ref = name.as_ref();
     let hexed_name = hex::encode(name_ref);
-    let table_dir = Path::new(root_dir.as_path()).join(hexed_name);
-    fs_extra::ensure_dir(table_dir.clone());
-    Table {
+    let room_dir = Path::new(root_dir.as_path()).join(hexed_name);
+    fs_extra::ensure_dir(room_dir.clone());
+    Room {
       name: name_ref.to_string(),
-      table_dir,
+      room_dir,
       root_dir,
     }
   }
@@ -32,27 +32,27 @@ impl Table {
     let new_name_ref = new_name.as_ref();
     self.name = new_name_ref.to_string();
     let hexed_name = hex::encode(self.name.clone());
-    let new_table_dir = Path::new(self.root_dir.as_path()).join(hexed_name);
-    let success = fs::rename(self.table_dir.clone(), new_table_dir.clone());
-    self.table_dir = new_table_dir;
+    let new_room_dir = Path::new(self.root_dir.as_path()).join(hexed_name);
+    let success = fs::rename(self.room_dir.clone(), new_room_dir.clone());
+    self.room_dir = new_room_dir;
     success.is_ok()
   }
 
   pub fn truncate(&self) -> bool {
-    fs::remove_dir_all(self.table_dir.clone()).is_ok()
+    fs::remove_dir_all(self.room_dir.clone()).is_ok()
   }
 
   pub fn has<S: AsRef<str>>(&self, k: S) -> bool {
     let key = k.as_ref();
     let hexed_key = hex::encode(key);
-    let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
+    let data_file_path = Path::new(self.room_dir.as_path()).join(hexed_key);
     data_file_path.exists() && data_file_path.is_file()
   }
 
   pub fn get<S: AsRef<str>>(&self, k: S) -> Option<String> {
     let key = k.as_ref();
     let hexed_key = hex::encode(key);
-    let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
+    let data_file_path = Path::new(self.room_dir.as_path()).join(hexed_key);
 
     if !data_file_path.exists() || !data_file_path.is_file() {
       return None;
@@ -71,7 +71,7 @@ impl Table {
     let key = k.as_ref();
     let value = v.as_ref();
     let hexed_key = hex::encode(key);
-    let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
+    let data_file_path = Path::new(self.room_dir.as_path()).join(hexed_key);
     let ensured = fs_extra::ensure_file(data_file_path.clone());
 
     if !ensured {
@@ -84,7 +84,7 @@ impl Table {
   pub fn remove<S: AsRef<str>>(&self, k: S) -> bool {
     let key = k.as_ref();
     let hexed_key = hex::encode(key);
-    let data_file_path = Path::new(self.table_dir.as_path()).join(hexed_key);
+    let data_file_path = Path::new(self.room_dir.as_path()).join(hexed_key);
 
     if !data_file_path.exists() || !data_file_path.is_file() {
       return true;
@@ -95,11 +95,11 @@ impl Table {
 
   pub fn keys(&self) -> Vec<String> {
     let mut keys = Vec::new();
-    if !self.table_dir.is_dir() {
+    if !self.room_dir.is_dir() {
       return keys;
     }
 
-    let dir = fs::read_dir(self.table_dir.as_path());
+    let dir = fs::read_dir(self.room_dir.as_path());
 
     if dir.is_err() {
       return keys;
@@ -137,11 +137,11 @@ impl Table {
 
   pub fn values(&self) -> Vec<String> {
     let mut values = Vec::new();
-    if !self.table_dir.is_dir() {
+    if !self.room_dir.is_dir() {
       return values;
     }
 
-    let dir = fs::read_dir(self.table_dir.as_path());
+    let dir = fs::read_dir(self.room_dir.as_path());
 
     if dir.is_err() {
       return values;
