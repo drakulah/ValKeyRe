@@ -1,6 +1,6 @@
 [package]
 name = "valkeyre"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["drakulah"]
 edition = "2021"
 description = "A key-value store, prioritizing ease of use."
