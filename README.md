@@ -1,5 +1,5 @@
 # ValKeyRe
-A high-performance key-value store library in Rust, prioritizing ease of use.
+A key-value store, prioritizing ease of use.
 
 # Example
 ```rs
