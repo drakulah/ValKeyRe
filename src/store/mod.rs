@@ -16,6 +16,9 @@ pub struct Store {
 }
 
 impl Store {
+  /**
+   * Initializes the store. Creates if the store is not present or if the store is present then uses it.
+   */
   pub fn init<S: AsRef<str>>(path: PathBuf, name: S) -> Store {
     let name_ref = name.as_ref();
     let hexed_name = hex::encode(name_ref);
@@ -28,10 +31,16 @@ impl Store {
     }
   }
 
+  /**
+   * Get the name of current store.
+   */
   pub fn get_name(&self) -> String {
     self.name.clone()
   }
 
+  /**
+   * Set the name of current store.
+   */
   pub fn set_name<S: AsRef<str>>(&mut self, new_name: S) -> bool {
     self.name = new_name.as_ref().to_string();
     let hexed_name = hex::encode(self.name.clone());
@@ -41,10 +50,16 @@ impl Store {
     success.is_ok()
   }
 
+  /**
+   * Initializes the room inside the store. Creates if the room is not present or if the room is present then uses it.
+   */
   pub fn init_room<S: AsRef<str>>(&self, name: S) -> Room {
     Room::init(self.store_dir.clone(), name)
   }
 
+  /**
+   * Completely delete the room from store.
+   */
   pub fn drop_room<S: AsRef<str>>(&self, name: S) -> bool {
     let name_ref = name.as_ref();
     let hexed_name = hex::encode(name_ref);

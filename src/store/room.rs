@@ -12,6 +12,9 @@ pub struct Room {
 }
 
 impl Room {
+  /**
+   * Initializes the room inside the store. Creates if the room is not present or if the room is present then uses it.
+   */
   pub fn init<S: AsRef<str>>(root_dir: PathBuf, name: S) -> Room {
     let name_ref = name.as_ref();
     let hexed_name = hex::encode(name_ref);
@@ -24,10 +27,16 @@ impl Room {
     }
   }
 
+  /**
+   * Get the name of current room.
+   */
   pub fn get_name(&self) -> String {
     self.name.clone()
   }
 
+  /**
+   * Set the name of current room.
+   */
   pub fn set_name<S: AsRef<str>>(&mut self, new_name: S) -> bool {
     let new_name_ref = new_name.as_ref();
     self.name = new_name_ref.to_string();
@@ -38,10 +47,16 @@ impl Room {
     success.is_ok()
   }
 
+  /**
+   * Remove all the maps from the room.
+   */
   pub fn truncate(&self) -> bool {
     fs::remove_dir_all(self.room_dir.clone()).is_ok()
   }
 
+  /**
+   * Check if the key is present.
+   */
   pub fn has<S: AsRef<str>>(&self, k: S) -> bool {
     let key = k.as_ref();
     let hexed_key = hex::encode(key);
@@ -49,6 +64,9 @@ impl Room {
     data_file_path.exists() && data_file_path.is_file()
   }
 
+  /**
+   * Get the value from the key.
+   */
   pub fn get<S: AsRef<str>>(&self, k: S) -> Option<String> {
     let key = k.as_ref();
     let hexed_key = hex::encode(key);
@@ -67,6 +85,9 @@ impl Room {
     Some(maybe_file_content.unwrap())
   }
 
+  /**
+   * Set the key and it's value.
+   */
   pub fn set<S: AsRef<str>>(&self, k: S, v: S) -> bool {
     let key = k.as_ref();
     let value = v.as_ref();
@@ -81,6 +102,9 @@ impl Room {
     fs::write(data_file_path, value).is_ok()
   }
 
+  /**
+   * Remove the map from the key.
+   */
   pub fn remove<S: AsRef<str>>(&self, k: S) -> bool {
     let key = k.as_ref();
     let hexed_key = hex::encode(key);
@@ -93,6 +117,9 @@ impl Room {
     fs::remove_file(data_file_path).is_ok()
   }
 
+  /**
+   * Get all the keys in the room.
+   */
   pub fn keys(&self) -> Vec<String> {
     let mut keys = Vec::new();
     if !self.room_dir.is_dir() {
@@ -135,6 +162,9 @@ impl Room {
     keys
   }
 
+  /**
+   * Get all the values in the room.
+   */
   pub fn values(&self) -> Vec<String> {
     let mut values = Vec::new();
     if !self.room_dir.is_dir() {
